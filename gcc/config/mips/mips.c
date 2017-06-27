@@ -3996,6 +3996,20 @@ mips_rtx_costs (rtx x, machine_mode mode, int outer_code,
 		    + set_src_cost (XEXP (XEXP (x, 1), 0), mode, speed));
 	  return true;
 	}
+	
+      /* (AND (NOT op0) op1) is a loongson mx64 insn that should done by following insns
+       *  dmtc1 op0 fop0 #4 cycles
+       *  dmtc1 op1 fop1 #4 cycles
+       *  pandn fdest fop0 fop1 #1 cycles
+       *  dmfc1 dest fdest. #4 cycles
+       */
+      if (TARGET_LOONGSON_3A
+	  && GET_CODE (XEXP (x, 0)) == NOT
+	  && GET_CODE (XEXP (x, 1)) == REG)
+	{
+          *total = 52; /* costs */
+	  return true;
+	}
 	    
       /* Fall through.  */
 
