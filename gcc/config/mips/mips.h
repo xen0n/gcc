@@ -268,6 +268,7 @@ struct mips_cpu_info {
 #define TARGET_LOONGSON_2EF         (TARGET_LOONGSON_2E || TARGET_LOONGSON_2F)
 #define TARGET_GS464		    (mips_arch == PROCESSOR_GS464)
 #define TARGET_GS464E		    (mips_arch == PROCESSOR_GS464E)
+#define TARGET_GS464V		    (mips_arch == PROCESSOR_GS464V)
 #define TARGET_GS264E		    (mips_arch == PROCESSOR_GS264E)
 #define TARGET_MIPS3900             (mips_arch == PROCESSOR_R3900)
 #define TARGET_MIPS4000             (mips_arch == PROCESSOR_R4000)
@@ -302,6 +303,7 @@ struct mips_cpu_info {
 				     || mips_tune == PROCESSOR_LOONGSON_2F)
 #define TUNE_GS464		    (mips_tune == PROCESSOR_GS464)
 #define TUNE_GS464E		    (mips_tune == PROCESSOR_GS464E)
+#define TUNE_GS464V		    (mips_tune == PROCESSOR_GS464V)
 #define TUNE_GS264E		    (mips_tune == PROCESSOR_GS264E)
 #define TUNE_MIPS3000               (mips_tune == PROCESSOR_R3000)
 #define TUNE_MIPS3900               (mips_tune == PROCESSOR_R3900)
@@ -796,10 +798,9 @@ struct mips_cpu_info {
      %{march=mips32r6: -mips32r6} \
      %{march=mips64|march=5k*|march=20k*|march=sb1*|march=sr71000 \
        |march=xlr: -mips64} \
-     %{march=mips64r2|march=loongson3a|march=gs464|march=gs464e|march=gs264e \
-       |march=octeon|march=xlp: -mips64r2} \
+     %{march=mips64r2|march=loongson3a|march=gs464|march=gs464e|march=gs464v \
+       |march=gs264e|march=octeon|march=xlp: -mips64r2} \
      %{march=mips64r3: -mips64r3} \
-     %{march=mips64r5: -mips64r5} \
      %{march=mips64r6|march=i6400|march=i6500|march=p6600: -mips64r6}}"
 
 /* A spec that injects the default multilib ISA if no architecture is
@@ -917,12 +918,12 @@ struct mips_cpu_info {
 #define MIPS_ASE_LOONGSON_EXT_SPEC						\
   "%{!mno-loongson-ext:								\
      %{march=loongson3a|march=gs464: -mloongson-ext}				\
-     %{march=gs464e|march=gs264e: %{!mno-loongson-ext2:			\
+     %{march=gs464e|march=gs464v|march=gs264e: %{!mno-loongson-ext2:		\
        -mloongson-ext2 -mloongson-ext}}}"
 
 #define MIPS_ASE_MSA_SPEC						\
   "%{!mno-msa:								\
-     %{march=gs264e: -mmsa}}"
+     %{march=gs464v|march=gs264e: -mmsa}}"
 
 #define DRIVER_SELF_SPECS \
   MIPS_ISA_LEVEL_SPEC,	  \
@@ -1113,6 +1114,7 @@ struct mips_cpu_info {
 				 && (TARGET_MIPS8000			\
 				     || TARGET_GS464			\
 				     || TARGET_GS464E			\
+				     || TARGET_GS464V			\
 				     || TARGET_GS264E))
 
 /* ISA has 4 operand unfused madd instructions of the form
@@ -1122,6 +1124,7 @@ struct mips_cpu_info {
 				 && !TARGET_MIPS8000			\
 				 && !TARGET_GS464			\
 				 && !TARGET_GS464E			\
+				 && !TARGET_GS464V			\
 				 && !TARGET_GS264E)
 
 /* ISA has 3 operand r6 fused madd instructions of the form
