@@ -844,6 +844,14 @@ struct mips_cpu_info {
   "%{mnan*:;mips32r6|mips64r6:-mnan=2008;march=m51*: \
 					 %{!msoft-float:-mnan=2008}}"
 
+/* Infer a -munaligned-accesses setting from a -mips argument and a -march
+   argument, on the assumption that fast unaligned accesses are desired
+   where possible.  */
+#define MIPS_UNALIGNED_ACCESSES_SPEC \
+  "%{munaligned-accesses|mno-unaligned-accesses:; \
+     mips32r6|mips64r6|march=gs464v: -munaligned-accesses; \
+     : -mno-unaligned-accesses}"
+
 #if (MIPS_ABI_DEFAULT == ABI_O64 \
      || MIPS_ABI_DEFAULT == ABI_N32 \
      || MIPS_ABI_DEFAULT == ABI_64)
@@ -891,7 +899,8 @@ struct mips_cpu_info {
   {"mips-plt", "%{!mplt:%{!mno-plt:-m%(VALUE)}}" }, \
   {"synci", "%{!msynci:%{!mno-synci:-m%(VALUE)}}" },			\
   {"lxc1-sxc1", "%{!mlxc1-sxc1:%{!mno-lxc1-sxc1:-m%(VALUE)}}" }, \
-  {"madd4", "%{!mmadd4:%{!mno-madd4:-m%(VALUE)}}" } \
+  {"madd4", "%{!mmadd4:%{!mno-madd4:-m%(VALUE)}}" }, \
+  {"unaligned-accesses", "%{!munaligned-accesses:%{!mno-unaligned-accesses:-m%(VALUE)}}" } \
 
 /* A spec that infers the:
    -mnan=2008 setting from a -mips argument,
@@ -899,6 +908,7 @@ struct mips_cpu_info {
    -mloongson-mmi setting from a -march argument.  */
 #define BASE_DRIVER_SELF_SPECS	\
   MIPS_ISA_NAN2008_SPEC,	\
+  MIPS_UNALIGNED_ACCESSES_SPEC,	\
   MIPS_ASE_DSP_SPEC, 		\
   MIPS_ASE_LOONGSON_MMI_SPEC,	\
   MIPS_ASE_LOONGSON_EXT_SPEC,	\
@@ -1157,7 +1167,10 @@ struct mips_cpu_info {
 
 #define ISA_HAS_LWL_LWR		(mips_isa_rev <= 5 && !TARGET_MIPS16)
 
-#define ISA_USES_LWL_LWR	ISA_HAS_LWL_LWR
+#define ISA_USES_LWL_LWR	(ISA_HAS_LWL_LWR && !TARGET_UNALIGNED_ACCESSES)
+
+#define ISA_HAS_FAST_UNALIGNED_ACCESSES		(mips_isa_rev >= 6	\
+						 || TARGET_GS464V)
 
 #define ISA_HAS_IEEE_754_LEGACY	(mips_isa_rev <= 5)
 

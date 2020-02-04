@@ -20254,6 +20254,22 @@ mips_option_override (void)
       target_flags |= MASK_LOONGSON_EXT;
     }
 
+  /* Don't emit R6-style unaligned load/stores on processors without efficient
+     unaligned accesses.  */
+  if (TARGET_UNALIGNED_ACCESSES && !ISA_HAS_FAST_UNALIGNED_ACCESSES)
+    {
+      error ("the %qs architecture does not have efficient unaligned"
+	     " accesses", mips_arch_info->name);
+    }
+
+  /* Similarly, TARGET_UNALIGNED_ACCESSES cannot be disabled on
+     !ISA_HAS_LWL_LWR processors.  */
+  if (!TARGET_UNALIGNED_ACCESSES && !ISA_HAS_LWL_LWR)
+    {
+      error ("the %qs architecture does not support lwl/lwr-style unaligned"
+	     " accesses", mips_arch_info->name);
+    }
+
   /* .eh_frame addresses should be the same width as a C pointer.
      Most MIPS ABIs support only one pointer size, so the assembler
      will usually know exactly how big an .eh_frame address is.
