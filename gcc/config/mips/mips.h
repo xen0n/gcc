@@ -1019,7 +1019,10 @@ struct mips_cpu_info {
    because the former are faster and can also have the effect of reducing
    code size.  */
 #define ISA_AVOID_DIV_HILO	((TARGET_LOONGSON_2EF			\
-				  || TARGET_GS464)			\
+				  || TARGET_GS464			\
+				  || TARGET_GS464E			\
+				  || TARGET_GS464V			\
+				  || TARGET_GS264E)			\
 				 && !TARGET_MIPS16)
 
 /* ISA supports instructions DDIV and DDIVU. */
