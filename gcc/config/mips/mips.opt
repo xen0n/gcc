@@ -477,5 +477,5 @@ Target Report Var(TARGET_LOONGSON_EXT2)
 Use Loongson EXTension R2 (EXT2) instructions.
 
 munaligned-accesses
-Target Report Var(TARGET_UNALIGNED_ACCESSES)
+Target Report Mask(UNALIGNED_ACCESSES)
 Emit ordinary load/stores for unaligned memory accesses.

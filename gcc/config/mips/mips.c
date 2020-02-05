@@ -20254,6 +20254,16 @@ mips_option_override (void)
       target_flags |= MASK_LOONGSON_EXT;
     }
 
+  if ((target_flags_explicit & MASK_UNALIGNED_ACCESSES) == 0)
+    {
+      /* Enable TARGET_UNALIGNED_ACCESSES on targets with efficient unaligned
+	 accesses.  */
+      if (ISA_HAS_FAST_UNALIGNED_ACCESSES)
+	target_flags |= MASK_UNALIGNED_ACCESSES;
+      else
+	target_flags &= ~MASK_UNALIGNED_ACCESSES;
+    }
+
   /* Don't emit R6-style unaligned load/stores on processors without efficient
      unaligned accesses.  */
   if (TARGET_UNALIGNED_ACCESSES && !ISA_HAS_FAST_UNALIGNED_ACCESSES)

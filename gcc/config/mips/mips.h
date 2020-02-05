@@ -850,7 +850,7 @@ struct mips_cpu_info {
 #define MIPS_UNALIGNED_ACCESSES_SPEC \
   "%{munaligned-accesses|mno-unaligned-accesses:; \
      mips32r6|mips64r6|march=gs464v: -munaligned-accesses; \
-     : -mno-unaligned-accesses}"
+     : }"
 
 #if (MIPS_ABI_DEFAULT == ABI_O64 \
      || MIPS_ABI_DEFAULT == ABI_N32 \
