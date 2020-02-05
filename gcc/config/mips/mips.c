@@ -8043,7 +8043,7 @@ mips_block_move_straight (rtx dest, rtx src, HOST_WIDE_INT length)
      picking the minimum of alignment or BITS_PER_WORD gets us the
      desired size for bits.  */
 
-  if (!ISA_USES_LWL_LWR)
+  if (!ISA_USES_LWL_LWR && !ISA_HAS_FAST_UNALIGNED_ACCESSES)
     bits = MIN (BITS_PER_WORD, MIN (MEM_ALIGN (src), MEM_ALIGN (dest)));
   else
     {
@@ -8065,7 +8065,7 @@ mips_block_move_straight (rtx dest, rtx src, HOST_WIDE_INT length)
   for (offset = 0, i = 0; offset + delta <= length; offset += delta, i++)
     {
       regs[i] = gen_reg_rtx (mode);
-      if (MEM_ALIGN (src) >= bits)
+      if (MEM_ALIGN (src) >= bits || !ISA_USES_LWL_LWR)
 	mips_emit_move (regs[i], adjust_address (src, mode, offset));
       else
 	{
@@ -8078,7 +8078,7 @@ mips_block_move_straight (rtx dest, rtx src, HOST_WIDE_INT length)
 
   /* Copy the chunks to the destination.  */
   for (offset = 0, i = 0; offset + delta <= length; offset += delta, i++)
-    if (MEM_ALIGN (dest) >= bits)
+    if (MEM_ALIGN (dest) >= bits || !ISA_USES_LWL_LWR)
       mips_emit_move (adjust_address (dest, mode, offset), regs[i]);
     else
       {
