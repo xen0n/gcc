@@ -1686,7 +1686,7 @@ FP_ASM_SPEC "\
   (ISA_HAS_MSA ? BITS_PER_MSA_REG : LONG_DOUBLE_TYPE_SIZE)
 
 /* All accesses must be aligned.  */
-#define STRICT_ALIGNMENT 1
+#define STRICT_ALIGNMENT ISA_USES_LWL_LWR
 
 /* Define this if you wish to imitate the way many other C compilers
    handle alignment of bitfields and the structures that contain
