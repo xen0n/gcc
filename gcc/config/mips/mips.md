@@ -801,6 +801,10 @@
 				 (DF "TARGET_HARD_FLOAT
 				      && TARGET_DOUBLE_FLOAT")])
 
+(define_mode_iterator LOONGSON_JOIN_MODE [DI
+					  (DF "TARGET_HARD_FLOAT
+					       && TARGET_DOUBLE_FLOAT")])
+
 ;; This mode iterator allows :HILO to be used as the mode of the
 ;; concatenated HI and LO registers.
 (define_mode_iterator HILO [(DI "!TARGET_64BIT") (TI "TARGET_64BIT")])
@@ -7755,6 +7759,23 @@
   [(set_attr "move_type" "load,fpload,store,fpstore")
    (set_attr "insn_count" "2,2,2,2")])
 
+;; Similar to above, but for Loongson.
+(define_insn "*loongson_join2_load_store<LOONGSON_JOIN_MODE:mode>"
+  [(set (match_operand:LOONGSON_JOIN_MODE 0 "nonimmediate_operand" "=d,f,m,m")
+	(match_operand:LOONGSON_JOIN_MODE 1 "nonimmediate_operand" "m,m,d,f"))
+   (set (match_operand:LOONGSON_JOIN_MODE 2 "nonimmediate_operand" "=d,f,m,m")
+	(match_operand:LOONGSON_JOIN_MODE 3 "nonimmediate_operand" "m,m,d,f"))]
+  "TARGET_64BIT && TARGET_LOONGSON_EXT && TARGET_LOAD_STORE_PAIRS && reload_completed"
+  {
+    bool load_p = (which_alternative == 0 || which_alternative == 1);
+    bool float_p = (which_alternative == 1 || which_alternative == 3);
+    return mips_loongson_output_bonded_load_store (operands, load_p, float_p);
+  }
+  [(set_attr "move_type" "load,fpload,store,fpstore")
+   (set_attr "insn_count" "1,1,1,1")
+   (set_attr "can_delay" "no,no,no,no")])
+
+
 ;; 2 HI/SI/SF/DF loads are joined.
 ;; P5600 does not support bonding of two LBs, hence QI mode is not included.
 ;; The loads must be non-volatile as they might be reordered at the time of asm
@@ -7828,6 +7849,35 @@
 	      (set (match_dup 2)
 		   (any_extend:SI (match_dup 3)))])]
   "")
+
+;; 2 DI/DF loads are joined for Loongson.
+(define_peephole2
+  [(set (match_operand:LOONGSON_JOIN_MODE 0 "register_operand")
+	(match_operand:LOONGSON_JOIN_MODE 1 "non_volatile_mem_operand"))
+   (set (match_operand:LOONGSON_JOIN_MODE 2 "register_operand")
+	(match_operand:LOONGSON_JOIN_MODE 3 "non_volatile_mem_operand"))]
+  "TARGET_64BIT && TARGET_LOONGSON_EXT && TARGET_LOAD_STORE_PAIRS
+   && mips_loongson_load_store_bonding_p (operands, <LOONGSON_JOIN_MODE:MODE>mode, true)"
+  [(parallel [(set (match_dup 0)
+		   (match_dup 1))
+	      (set (match_dup 2)
+		   (match_dup 3))])]
+  "")
+
+;; 2 DI/DF stores are joined for Loongson.
+(define_peephole2
+  [(set (match_operand:LOONGSON_JOIN_MODE 0 "memory_operand")
+	(match_operand:LOONGSON_JOIN_MODE 1 "register_operand"))
+   (set (match_operand:LOONGSON_JOIN_MODE 2 "memory_operand")
+	(match_operand:LOONGSON_JOIN_MODE 3 "register_operand"))]
+  "TARGET_64BIT && TARGET_LOONGSON_EXT && TARGET_LOAD_STORE_PAIRS
+   && mips_loongson_load_store_bonding_p (operands, <LOONGSON_JOIN_MODE:MODE>mode, false)"
+  [(parallel [(set (match_dup 0)
+		   (match_dup 1))
+	      (set (match_dup 2)
+		   (match_dup 3))])]
+  "")
+
 
 
 ;; Synchronization instructions.
