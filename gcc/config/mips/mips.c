@@ -20926,6 +20926,130 @@ mips_load_store_bonding_p (rtx *operands, machine_mode mode, bool load_p)
   return true;
 }
 
+/* Similar to mips_load_store_bonding_p, but has stricter alignment and
+   offset range requirements.  */
+bool
+mips_loongson_load_store_bonding_p (rtx *operands, machine_mode mode, bool load_p)
+{
+  rtx reg1, reg2, mem1, mem2, base1, base2;
+  enum reg_class rc1, rc2;
+  HOST_WIDE_INT offset1, offset2, base_offset;
+
+  if (load_p)
+    {
+      reg1 = operands[0];
+      reg2 = operands[2];
+      mem1 = operands[1];
+      mem2 = operands[3];
+    }
+  else
+    {
+      reg1 = operands[1];
+      reg2 = operands[3];
+      mem1 = operands[0];
+      mem2 = operands[2];
+    }
+
+  if (mips_address_insns (XEXP (mem1, 0), mode, false) == 0
+      || mips_address_insns (XEXP (mem2, 0), mode, false) == 0)
+    return false;
+
+  mips_split_plus (XEXP (mem1, 0), &base1, &offset1);
+  mips_split_plus (XEXP (mem2, 0), &base2, &offset2);
+
+  /* Base regs do not match.  */
+  if (!REG_P (base1) || !rtx_equal_p (base1, base2))
+    return false;
+
+  /* Either of the loads is clobbering base register.  It is legitimate to bond
+     loads if second load clobbers base register.  However, hardware does not
+     support such bonding.  */
+  if (load_p
+      && (REGNO (reg1) == REGNO (base1)
+	  || (REGNO (reg2) == REGNO (base1))))
+    return false;
+
+  /* Loading in same registers.  */
+  if (load_p
+      && REGNO (reg1) == REGNO (reg2))
+    return false;
+
+  /* The loads/stores are not of same type.  */
+  rc1 = REGNO_REG_CLASS (REGNO (reg1));
+  rc2 = REGNO_REG_CLASS (REGNO (reg2));
+  if (rc1 != rc2
+      && !reg_class_subset_p (rc1, rc2)
+      && !reg_class_subset_p (rc2, rc1))
+    return false;
+
+  if (abs (offset1 - offset2) != GET_MODE_SIZE (mode))
+    return false;
+
+  /* The two memory operands are guaranteed to be consecutive, check for
+     at least 128-bit alignment.  */
+  if (MEM_ALIGN (mem1) < 128 && MEM_ALIGN (mem2) < 128)
+    return false;
+
+  /* gslq/gssq cannot encode offsets outside of [-4096, 4095].  */
+  if (offset1 < -4096 || offset1 > 4095 || offset2 < -4096 || offset2 > 4095)
+    return false;
+
+  /* The lower offset must be multiple of 16 to be encodable.  */
+  base_offset = MIN (offset1, offset2);
+  if (base_offset % 16 != 0)
+    return false;
+
+  return true;
+}
+
+const char *
+mips_loongson_output_bonded_load_store (rtx *operands, bool load_p,
+					bool float_p)
+{
+  rtx mem1, mem2, base1, base2;
+  HOST_WIDE_INT offset1, offset2;
+
+  if (load_p)
+    {
+      mem1 = operands[1];
+      mem2 = operands[3];
+    }
+  else
+    {
+      mem1 = operands[0];
+      mem2 = operands[2];
+    }
+
+  mips_split_plus (XEXP (mem1, 0), &base1, &offset1);
+  mips_split_plus (XEXP (mem2, 0), &base2, &offset2);
+
+  /* Figure out which address is lower and use that as base of gslq/gssq.  */
+  if (offset1 < offset2)
+    /* operand order is reg2, reg1, mem1 */
+    if (load_p)
+      if (float_p)
+	return "gslqc1\t%2,%0,%1";
+      else
+	return "gslq\t%2,%0,%1";
+    else
+      if (float_p)
+	return "gssqc1\t%3,%1,%0";
+      else
+	return "gssq\t%3,%1,%0";
+  else
+    /* operand order is reg1, reg2, mem2 */
+    if (load_p)
+      if (float_p)
+	return "gslqc1\t%0,%2,%3";
+      else
+	return "gslq\t%0,%2,%3";
+    else
+      if (float_p)
+	return "gssqc1\t%1,%3,%2";
+      else
+	return "gssq\t%1,%3,%2";
+}
+
 /* OPERANDS describes the operands to a pair of SETs, in the order
    dest1, src1, dest2, src2.  Return true if the operands can be used
    in an LWP or SWP instruction; LOAD_P says which.  */
