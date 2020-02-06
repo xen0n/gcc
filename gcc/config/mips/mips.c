@@ -21025,29 +21025,29 @@ mips_loongson_output_bonded_load_store (rtx *operands, bool load_p,
 
   /* Figure out which address is lower and use that as base of gslq/gssq.  */
   if (offset1 < offset2)
-    /* operand order is reg1, reg2, mem1 */
+    /* operand order is reg2, reg1, mem1 */
     if (load_p)
       if (float_p)
-	return "gslqc1\t%0,%2,%1";
+	return "gslqc1\t%2,%0,%1";
       else
-	return "gslq\t%0,%2,%1";
+	return "gslq\t%2,%0,%1";
     else
       if (float_p)
-	return "gssqc1\t%1,%3,%0";
+	return "gssqc1\t%3,%1,%0";
       else
-	return "gssq\t%1,%3,%0";
+	return "gssq\t%3,%1,%0";
   else
-    /* operand order is reg2, reg1, mem2 */
+    /* operand order is reg1, reg2, mem2 */
     if (load_p)
       if (float_p)
-	return "gslqc1\t%2,%0,%3";
+	return "gslqc1\t%0,%2,%3";
       else
-	return "gslq\t%2,%0,%3";
+	return "gslq\t%0,%2,%3";
     else
       if (float_p)
-	return "gssqc1\t%3,%1,%2";
+	return "gssqc1\t%1,%3,%2";
       else
-	return "gssq\t%3,%1,%2";
+	return "gssq\t%1,%3,%2";
 }
 
 /* OPERANDS describes the operands to a pair of SETs, in the order
