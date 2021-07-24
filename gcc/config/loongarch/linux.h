@@ -31,8 +31,8 @@ along with GCC; see the file COPYING3.  If not see
 #define GNU_USER_LINK_EMULATION32 "elf32loongarch"
 #define GNU_USER_LINK_EMULATION64 "elf64loongarch"
 
-#define GLIBC_DYNAMIC_LINKERLP32 "/lib32/ld.so.1"
-#define GLIBC_DYNAMIC_LINKERLP64 "/lib64/ld.so.1"
+#define GLIBC_DYNAMIC_LINKERLP32 "/lib32/ld-linux-loongarch32.so.1"
+#define GLIBC_DYNAMIC_LINKERLP64 "/lib64/ld-linux-loongarch64.so.1"
 
 #define GNU_USER_DYNAMIC_LINKERLP32 GLIBC_DYNAMIC_LINKERLP32
 #define GNU_USER_DYNAMIC_LINKERLP64 GLIBC_DYNAMIC_LINKERLP64
