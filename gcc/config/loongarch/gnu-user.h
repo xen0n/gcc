@@ -76,7 +76,9 @@ along with GCC; see the file COPYING3.  If not see
 #undef ASM_OUTPUT_REG_POP
 
 #undef LIB_SPEC
-#define LIB_SPEC GNU_USER_TARGET_LIB_SPEC
+/* LoongArch support in glibc comes after the libc-libpthread merger, so
+   LoongArch systems never had separate libpthread.  */
+#define LIB_SPEC GNU_USER_TARGET_NO_PTHREADS_LIB_SPEC
 
 #define NO_SHARED_SPECS ""
 
