@@ -44,7 +44,9 @@ along with GCC; see the file COPYING3.  If not see
 #define SUBTARGET_CC1_SPEC GNU_USER_TARGET_CC1_SPEC
 
 #undef LIB_SPEC
-#define LIB_SPEC GNU_USER_TARGET_LIB_SPEC
+/* LoongArch support in glibc comes after the libc-libpthread merger, so
+   LoongArch systems never had separate libpthread.  */
+#define LIB_SPEC GNU_USER_TARGET_NO_PTHREADS_LIB_SPEC
 
 /* Define this to be nonzero if static stack checking is supported.  */
 #define STACK_CHECK_STATIC_BUILTIN 1
