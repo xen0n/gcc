@@ -1386,7 +1386,7 @@
 	(sign_extend:DI
 	    (truncate:SHORT (match_operand:DI 1 "register_operand" "r"))))]
   "TARGET_64BIT"
-  "ext.w.<SHORT:size>\t%0,%1"
+  "ext.w.<size>\t%0,%1"
   [(set_attr "move_type" "signext")
    (set_attr "mode" "DI")])
 
@@ -1395,7 +1395,7 @@
 	(sign_extend:SI
 	    (truncate:SHORT (match_operand:DI 1 "register_operand" "r"))))]
   "TARGET_64BIT"
-  "ext.w.<SHORT:size>\t%0,%1"
+  "ext.w.<size>\t%0,%1"
   [(set_attr "move_type" "signext")
    (set_attr "mode" "SI")])
 
@@ -1404,7 +1404,7 @@
 	(sign_extend:HI
 	    (truncate:QI (match_operand:DI 1 "register_operand" "r"))))]
   "TARGET_64BIT"
-  "ext.w.<SHORT:size>\t%0,%1"
+  "ext.w.<size>\t%0,%1"
   [(set_attr "move_type" "signext")
    (set_attr "mode" "SI")])
 
