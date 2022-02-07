@@ -1381,33 +1381,6 @@
   [(set_attr "move_type" "signext,load")
    (set_attr "mode" "SI")])
 
-(define_insn "*extenddi_truncate<mode>"
-  [(set (match_operand:DI 0 "register_operand" "=r")
-	(sign_extend:DI
-	    (truncate:SHORT (match_operand:DI 1 "register_operand" "r"))))]
-  "TARGET_64BIT"
-  "ext.w.<size>\t%0,%1"
-  [(set_attr "move_type" "signext")
-   (set_attr "mode" "DI")])
-
-(define_insn "*extendsi_truncate<mode>"
-  [(set (match_operand:SI 0 "register_operand" "=r")
-	(sign_extend:SI
-	    (truncate:SHORT (match_operand:DI 1 "register_operand" "r"))))]
-  "TARGET_64BIT"
-  "ext.w.<size>\t%0,%1"
-  [(set_attr "move_type" "signext")
-   (set_attr "mode" "SI")])
-
-(define_insn "*extendhi_truncateqi"
-  [(set (match_operand:HI 0 "register_operand" "=r")
-	(sign_extend:HI
-	    (truncate:QI (match_operand:DI 1 "register_operand" "r"))))]
-  "TARGET_64BIT"
-  "ext.w.<size>\t%0,%1"
-  [(set_attr "move_type" "signext")
-   (set_attr "mode" "SI")])
-
 (define_insn "extendsfdf2"
   [(set (match_operand:DF 0 "register_operand" "=f")
 	(float_extend:DF (match_operand:SF 1 "register_operand" "f")))]
