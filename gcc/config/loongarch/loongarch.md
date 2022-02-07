@@ -1404,7 +1404,7 @@
 	(sign_extend:HI
 	    (truncate:QI (match_operand:DI 1 "register_operand" "r"))))]
   "TARGET_64BIT"
-  "ext.w.<size>\t%0,%1"
+  "ext.w.b\t%0,%1"
   [(set_attr "move_type" "signext")
    (set_attr "mode" "SI")])
 
