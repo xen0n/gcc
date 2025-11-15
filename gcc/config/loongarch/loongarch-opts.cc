@@ -1045,6 +1045,40 @@ loongarch_target_option_override (struct loongarch_target *target,
 }
 
 
+/* Parser for -mbuiltin-trap-impl=STRATEGY.  */
+int
+loongarch_parse_mbuiltin_trap_impl (const char *val)
+{
+  if (!val || *val == '\0' || !strcmp (val, "amswap.w"))
+    return -1;
+
+  if (!strncmp (val, "break-", 6))
+    {
+      const char *code_substr = val + 6;
+      int err = 0;
+      HOST_WIDE_INT r = integral_argument (code_substr, &err, false);
+      if (err || r < 0 || r > 0x7fff)
+	{
+	  error ("code %qs invalid for the %qs instruction", code_substr,
+		 "break");
+	  inform (UNKNOWN_LOCATION,
+		  "code for the %qs instruction must be an integer between "
+		  "%d and %d, inclusive",
+		  "break", 0, 0x7fff);
+	  return -1;
+	}
+      return (int) r;
+    }
+
+  error ("unrecognized strategy for %<-mbuiltin-trap-impl%>: %qs", val);
+  inform (UNKNOWN_LOCATION,
+	  "valid values are %<break-CODE%> (CODE between %d and %d, "
+	  "inclusive) and %<amswap.w%>",
+	  0, 0x7fff);
+  return -1;
+}
+
+
 /* Resolve options that's not covered by la_target.  */
 void
 loongarch_init_misc_options (struct gcc_options *opts,
@@ -1055,6 +1089,10 @@ loongarch_init_misc_options (struct gcc_options *opts,
 
   /* -mrecip options.  */
   opts->x_recip_mask = loongarch_parse_mrecip_scheme (opts->x_la_recip_name);
+
+  /* -mbuiltin-trap-impl.  */
+  opts->x_la_break_code
+      = loongarch_parse_mbuiltin_trap_impl (opts->x_la_builtin_trap_impl);
 
 #define INIT_TARGET_FLAG(NAME, INIT) \
   { \

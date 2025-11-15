@@ -1,0 +1,6 @@
+/* { dg-do compile } */
+/* { dg-options "-O2 -w -fisolate-erroneous-paths-dereference -mbuiltin-trap-impl=break-0x7fff" } */
+/* { dg-final { scan-assembler "break\\t32767" } } */
+
+#define BUILTIN_TRAP_IMPL_TEST
+#include "builtin-trap-impl-test.c"
