@@ -79,12 +79,15 @@ loongarch_define_unconditional_macros (cpp_reader *pfile)
   builtin_define ("__builtin_infq=__builtin_inff128");
   builtin_define ("__builtin_huge_valq=__builtin_huge_valf128");
 
-  /* Native Data Sizes.  */
-  builtin_define_with_int_value ("_LOONGARCH_SZINT", INT_TYPE_SIZE);
-  builtin_define_with_int_value ("_LOONGARCH_SZLONG", LONG_TYPE_SIZE);
-  builtin_define_with_int_value ("_LOONGARCH_SZPTR", POINTER_SIZE);
-  builtin_define_with_int_value ("_LOONGARCH_FPSET", 32);
-  builtin_define_with_int_value ("_LOONGARCH_SPFPSET", 32);
+  /* Legacy compatibility macros for native data sizes.  */
+  if (TARGET_ABI_LP64)
+    {
+      builtin_define_with_int_value ("_LOONGARCH_SZINT", INT_TYPE_SIZE);
+      builtin_define_with_int_value ("_LOONGARCH_SZLONG", LONG_TYPE_SIZE);
+      builtin_define_with_int_value ("_LOONGARCH_SZPTR", POINTER_SIZE);
+      builtin_define_with_int_value ("_LOONGARCH_FPSET", 32);
+      builtin_define_with_int_value ("_LOONGARCH_SPFPSET", 32);
+    }
 }
 
 static void
@@ -100,13 +103,19 @@ loongarch_update_cpp_builtins (cpp_reader *pfile)
   builtin_define_with_value ("__loongarch_tune",
 			     loongarch_tune_strings[la_target.cpu_tune], 1);
 
-  builtin_undef ("_LOONGARCH_ARCH");
-  builtin_define_with_value ("_LOONGARCH_ARCH",
-			     loongarch_arch_strings[la_target.cpu_arch], 1);
+  /* Legacy compatibility macros for arch/tune info.  */
+  if (TARGET_64BIT)
+    {
+      builtin_undef ("_LOONGARCH_ARCH");
+      builtin_define_with_value ("_LOONGARCH_ARCH",
+				 loongarch_arch_strings[la_target.cpu_arch],
+				 1);
 
-  builtin_undef ("_LOONGARCH_TUNE");
-  builtin_define_with_value ("_LOONGARCH_TUNE",
-			     loongarch_tune_strings[la_target.cpu_tune], 1);
+      builtin_undef ("_LOONGARCH_TUNE");
+      builtin_define_with_value ("_LOONGARCH_TUNE",
+				 loongarch_tune_strings[la_target.cpu_tune],
+				 1);
+    }
 
   builtin_undef ("__loongarch_double_float");
   builtin_undef ("__loongarch_single_float");
