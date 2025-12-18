@@ -103,6 +103,9 @@ loongarch_update_cpp_builtins (cpp_reader *pfile)
   builtin_define_with_value ("__loongarch_tune",
 			     loongarch_tune_strings[la_target.cpu_tune], 1);
 
+  loongarch_def_or_undef (la_target.isa.base != ISA_BASE_LA32R,
+			  "__loongarch_non_reduced", pfile);
+
   /* Legacy compatibility macros for arch/tune info.  */
   if (TARGET_64BIT)
     {
